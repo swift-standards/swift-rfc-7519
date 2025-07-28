@@ -18,7 +18,7 @@ let package = Package(
         .iOS(.v16)
     ],
     products: [
-        .library(name: .rfc7519, targets: [.rfc7519]),
+        .library(name: .rfc7519, targets: [.rfc7519])
     ],
     dependencies: [
         // Add RFC dependencies here as needed
