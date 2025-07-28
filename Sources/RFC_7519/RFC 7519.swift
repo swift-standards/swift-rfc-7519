@@ -17,6 +17,10 @@ public enum RFC_7519 {
         public let payload: Payload
         public let signature: Data
         
+        /// Original base64url encoded strings for efficient signing input
+        private let headerBase64URL: String?
+        private let payloadBase64URL: String?
+        
         /// Creates a JWT from its components
         /// - Parameters:
         ///   - header: The JWT header
@@ -26,6 +30,23 @@ public enum RFC_7519 {
             self.header = header
             self.payload = payload
             self.signature = signature
+            self.headerBase64URL = nil
+            self.payloadBase64URL = nil
+        }
+        
+        /// Creates a JWT from its components with original base64url strings
+        /// - Parameters:
+        ///   - header: The JWT header
+        ///   - payload: The JWT payload (claims)
+        ///   - signature: The signature bytes
+        ///   - headerBase64URL: Original base64url encoded header string
+        ///   - payloadBase64URL: Original base64url encoded payload string
+        private init(header: Header, payload: Payload, signature: Data, headerBase64URL: String, payloadBase64URL: String) {
+            self.header = header
+            self.payload = payload
+            self.signature = signature
+            self.headerBase64URL = headerBase64URL
+            self.payloadBase64URL = payloadBase64URL
         }
         
         /// Parses a JWT from its compact serialization format
@@ -67,21 +88,32 @@ public enum RFC_7519 {
                 throw Error.invalidFormat("Invalid base64url encoding in signature")
             }
             
-            return JWT(header: header, payload: payload, signature: signature)
+            return JWT(header: header, payload: payload, signature: signature, headerBase64URL: components[0], payloadBase64URL: components[1])
         }
         
         /// Serializes the JWT to its compact format
         /// - Returns: JWT string in format "header.payload.signature"
         /// - Throws: `Error` if encoding fails
         public func compactSerialization() throws -> String {
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = .sortedKeys
+            let headerBase64: String
+            let payloadBase64: String
             
-            let headerData = try encoder.encode(header)
-            let payloadData = try encoder.encode(payload)
+            // Use original base64url strings if available for efficiency and consistency
+            if let originalHeaderBase64 = headerBase64URL, let originalPayloadBase64 = payloadBase64URL {
+                headerBase64 = originalHeaderBase64
+                payloadBase64 = originalPayloadBase64
+            } else {
+                // Fallback to re-encoding if original strings are not available
+                let encoder = JSONEncoder()
+                encoder.outputFormatting = .sortedKeys
+                
+                let headerData = try encoder.encode(header)
+                let payloadData = try encoder.encode(payload)
+                
+                headerBase64 = headerData.base64URLEncodedString()
+                payloadBase64 = payloadData.base64URLEncodedString()
+            }
             
-            let headerBase64 = headerData.base64URLEncodedString()
-            let payloadBase64 = payloadData.base64URLEncodedString()
             let signatureBase64 = signature.base64URLEncodedString()
             
             return "\(headerBase64).\(payloadBase64).\(signatureBase64)"
@@ -91,6 +123,12 @@ public enum RFC_7519 {
         /// - Returns: The data to be signed/verified
         /// - Throws: `Error` if encoding fails
         public func signingInput() throws -> Data {
+            // Use original base64url strings if available for efficiency
+            if let headerBase64 = headerBase64URL, let payloadBase64 = payloadBase64URL {
+                return "\(headerBase64).\(payloadBase64)".data(using: .ascii)!
+            }
+            
+            // Fallback to re-encoding if original strings are not available
             let encoder = JSONEncoder()
             encoder.outputFormatting = .sortedKeys
             

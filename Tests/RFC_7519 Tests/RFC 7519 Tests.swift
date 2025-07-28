@@ -115,6 +115,29 @@ struct RFC_7519_Tests {
         #expect(signingInputString!.components(separatedBy: ".").count == 2)
     }
     
+    @Test("JWT preserves original base64url strings for efficiency")
+    func testOriginalBase64URLPreservation() throws {
+        // Use a real JWT with known base64url components
+        let originalToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        
+        // Parse the JWT
+        let jwt = try RFC_7519.JWT.parse(from: originalToken)
+        
+        // Get signing input - should use original base64url strings
+        let signingInput = try jwt.signingInput()
+        let signingInputString = String(data: signingInput, encoding: .ascii)!
+        
+        // Since we preserved the original strings, the signing input should be exactly the original header.payload
+        let originalComponents = originalToken.components(separatedBy: ".")
+        let originalSigningInput = "\(originalComponents[0]).\(originalComponents[1])"
+        
+        #expect(signingInputString == originalSigningInput)
+        
+        // Also test that compact serialization preserves the original strings
+        let serialized = try jwt.compactSerialization()
+        #expect(serialized == originalToken)
+    }
+    
     // MARK: - Header Tests
     
     @Test("JWT header with basic fields")
