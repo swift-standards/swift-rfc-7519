@@ -247,7 +247,7 @@ struct JWT_Creation_Tests {
     @Test("JWT creation error handling")
     func testJWTCreationErrorHandling() throws {
         let failingSigner: (Data) throws -> Data = { _ in
-            struct SigningError: Error {}
+            struct SigningError: Swift.Error {}
             throw SigningError()
         }
         
