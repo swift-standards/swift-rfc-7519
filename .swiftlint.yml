@@ -3,7 +3,12 @@ disabled_rules:
   - trailing_comma
   - redundant_discardable_let
   - trailing_whitespace
-  - type_name
+  - unused_closure_parameter
+  - non_optional_string_data_conversion
+  - for_where
+  - nesting
+  - trailing_newline
+  - vertical_whitespace
 
 opt_in_rules:
   - explicit_init
