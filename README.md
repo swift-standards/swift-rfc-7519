@@ -1,155 +1,232 @@
-# swift-rfc-7519
+# Swift RFC 7519
 
-Swift implementation of [RFC 7519: JSON Web Token (JWT)](https://www.rfc-editor.org/rfc/rfc7519.html)
+[![CI](https://github.com/swift-standards/swift-rfc-7519/workflows/CI/badge.svg)](https://github.com/swift-standards/swift-rfc-7519/actions/workflows/ci.yml)
+![Development Status](https://img.shields.io/badge/status-active--development-blue.svg)
+
+Swift implementation of RFC 7519: JSON Web Token (JWT).
 
 ## Overview
 
-This package provides a **pure JWT implementation** without any cryptographic dependencies, making it lightweight, flexible, and universally compatible across all Swift platforms.
+RFC 7519 defines JSON Web Token (JWT), a compact, URL-safe means of representing claims to be transferred between two parties. This package provides a pure Swift implementation of JWT parsing, validation, and serialization without cryptographic dependencies, making it lightweight and universally compatible across all Swift platforms. The crypto-agnostic design allows you to choose your own signature implementation or use JWT inspection without verification.
 
 ## Features
 
-- ✅ **RFC 7519 Compliant**: Full implementation of the JWT specification
-- 🪶 **Zero Dependencies**: Pure Swift implementation with no crypto dependencies
-- 🌐 **Cross-Platform**: Works on all Swift platforms (Linux, Windows, macOS, iOS, etc.)
-- 🔧 **Flexible**: Generic interface supports any cryptographic backend
-- ⚡ **Fast**: Minimal overhead for parsing and inspection use cases
-- 🧪 **Testable**: Easy to mock signers/verifiers for testing
-- 📦 **Modular**: Choose your crypto implementation separately
+- **RFC Compliant**: Full implementation of RFC 7519 JWT specification
+- **Zero Crypto Dependencies**: Pure Swift JWT handling with optional crypto integration
+- **Complete Claims Support**: All registered claims (iss, sub, aud, exp, nbf, iat, jti) plus custom claims
+- **Timing Validation**: Built-in expiration and not-before validation with clock skew tolerance
+- **Base64URL**: Proper RFC 4648 base64url encoding/decoding
+- **Type-Safe**: Strongly typed claims with generic access methods
+- **Sendable**: Full Swift 6 concurrency support
+- **Cross-Platform**: Works on all Swift platforms
 
 ## Installation
 
-### Swift Package Manager
-
-Add this to your Package.swift:
+Add swift-rfc-7519 to your package dependencies:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-web-standards/swift-rfc-7519.git", from: "1.0.0")
+    .package(url: "https://github.com/swift-standards/swift-rfc-7519.git", from: "0.1.0")
 ]
+```
+
+Then add it to your target:
+
+```swift
+.target(
+    name: "YourTarget",
+    dependencies: [
+        .product(name: "RFC_7519", package: "swift-rfc-7519")
+    ]
+)
 ```
 
 ## Quick Start
 
-### Core Usage (No Crypto Dependencies)
+### Parsing and Inspecting JWTs
 
 ```swift
 import RFC_7519
 
-// Parse existing JWT
+// Parse a JWT token
+let tokenString = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsInN1YiI6InVzZXIxMjMiLCJleHAiOjE3MzAwMDAwMDB9.signature"
 let jwt = try RFC_7519.JWT.parse(from: tokenString)
 
-// Access claims
+// Access standard claims
 print("Issuer: \(jwt.payload.iss ?? "unknown")")
 print("Subject: \(jwt.payload.sub ?? "unknown")")
-print("Custom claim: \(jwt.payload.additionalClaim("role", as: String.self) ?? "none")")
+print("Expires: \(jwt.payload.exp ?? 0)")
 
-// Validate timing (without signature verification)
+// Access custom claims
+if let role = jwt.payload.additionalClaim("role", as: String.self) {
+    print("Role: \(role)")
+}
+
+// Check header information
+print("Algorithm: \(jwt.header.alg)")
+print("Type: \(jwt.header.typ ?? "JWT")")
+```
+
+### Validating JWT Timing
+
+```swift
+// Validate expiration and not-before claims
 try jwt.payload.validateTiming()
-```
 
-### With Cryptographic Functionality
+// Validate with custom clock skew tolerance (default is 60 seconds)
+try jwt.payload.validateTiming(clockSkew: 120)
 
-For signing and verifying JWTs, use companion packages:
-
-```swift
-// Add crypto package
-dependencies: [
-    .package(url: "https://github.com/swift-web-standards/swift-rfc-7519.git", from: "1.0.0"),
-    .package(url: "https://github.com/swift-web-standards/swift-rfc-7519-crypto.git", from: "1.0.0"),
-]
-```
-
-```swift
-import RFC_7519
-import RFC_7519JWTCrypto
-
-// Create and sign JWT
-let jwt = try RFC_7519.JWT.hmacSHA256(
-    issuer: "example.com",
-    subject: "user123",
-    expiresIn: 3600,
-    claims: ["role": "admin"],
-    secretKey: "my-secret-key"
-)
-
-// Verify JWT
-let verificationKey = VerificationKey.symmetric(string: "my-secret-key")
-let isValid = try jwt.verify(with: verificationKey)
-```
-
-### Generic Interface (Any Crypto Library)
-
-```swift
-import RFC_7519
-
-// Create JWT with custom signer
-let jwt = try RFC_7519.JWT(
-    algorithmName: "HS256",
-    issuer: "example.com", 
-    subject: "user123",
-    signer: { signingInput in
-        // Use your preferred crypto library
-        return yourCryptoLibrary.hmacSHA256(signingInput, key: "secret")
-    }
-)
-
-// Verify with custom verifier
-let isValid = try jwt.verify { signingInput, signature, algorithm in
-    return yourCryptoLibrary.verifyHMAC(signature, for: signingInput, algorithm: algorithm)
+// Manual expiration check
+if let exp = jwt.payload.exp, Date(timeIntervalSince1970: exp) < Date() {
+    print("Token has expired")
 }
 ```
 
-## Architecture
-
-### Core Package (This Repository)
-- **Pure JWT parsing, validation, and serialization**
-- **Generic signing/verification interfaces**
-- **Zero cryptographic dependencies**
-
-### Companion Packages
-- **[swift-rfc-7519-crypto](https://github.com/swift-web-standards/swift-rfc-7519-crypto)**: Cross-platform crypto using swift-crypto
-- **[swift-rfc-7519-cryptokit](https://github.com/swift-web-standards/swift-rfc-7519-cryptokit)**: Apple platforms using CryptoKit
-
-## Supported JWT Features
-
-- ✅ All standard registered claims (iss, sub, aud, exp, nbf, iat, jti)
-- ✅ Custom claims with type-safe access
-- ✅ Multiple audience support
-- ✅ Timing validation with configurable clock skew
-- ✅ Base64URL encoding/decoding (RFC 4648 Section 5)
-- ✅ Compact serialization format
-- ✅ Header parameter support (typ, alg, kid, cty, etc.)
-
-## Testing
+### Creating JWTs
 
 ```swift
-// Mock signer for testing
-let mockSigner: (Data) throws -> Data = { _ in
-    Data([0x01, 0x02, 0x03, 0x04])
-}
-
-let jwt = try RFC_7519.JWT(
-    algorithmName: "HS256",
-    issuer: "test",
-    subject: "user", 
-    signer: mockSigner
+// Create JWT payload
+let payload = RFC_7519.JWT.Payload(
+    iss: "example.com",
+    sub: "user123",
+    aud: .single("https://api.example.com"),
+    exp: Date().addingTimeInterval(3600),
+    iat: Date(),
+    additionalClaims: ["role": "admin", "department": "engineering"]
 )
+
+// Create JWT header
+let header = RFC_7519.JWT.Header(
+    alg: "HS256",
+    typ: "JWT"
+)
+
+// Create JWT (requires signature - see below for signing)
+let signature = Data() // Replace with actual signature
+let jwt = RFC_7519.JWT(header: header, payload: payload, signature: signature)
+
+// Serialize to string
+let tokenString = try jwt.compactSerialization()
 ```
 
-## Documentation
+### Working with Audiences
 
-- **[RFC 7519 Specification](https://www.rfc-editor.org/rfc/rfc7519.html)**: Official JWT standard
+```swift
+// Single audience
+let payload1 = RFC_7519.JWT.Payload(
+    iss: "example.com",
+    sub: "user123",
+    aud: .single("https://api.example.com")
+)
 
-## Use Cases
+// Multiple audiences
+let payload2 = RFC_7519.JWT.Payload(
+    iss: "example.com",
+    sub: "user123",
+    aud: .multiple(["https://api.example.com", "https://admin.example.com"])
+)
 
-This package is perfect for:
+// Access audience values
+if case .single(let aud) = payload1.aud {
+    print("Single audience: \(aud)")
+}
 
-- 🔍 **JWT Inspection**: Parse and examine JWT contents without verification
-- 🧪 **Testing**: Mock JWT creation and verification for unit tests
-- 🏗️ **Custom Crypto**: Integrate with specialized cryptographic libraries
-- 📱 **Cross-Platform**: Deploy JWT functionality on any Swift platform
-- 🪶 **Minimal Dependencies**: Keep your dependency graph clean
+if case .multiple(let auds) = payload2.aud {
+    print("Multiple audiences: \(auds)")
+}
+```
+
+## Usage
+
+### JWT Structure
+
+```swift
+public struct JWT: Codable, Hashable, Sendable {
+    public let header: Header
+    public let payload: Payload
+    public let signature: Data
+
+    init(header: Header, payload: Payload, signature: Data)
+    static func parse(from token: String) throws -> JWT
+    func compactSerialization() throws -> String
+    func signingInput() throws -> Data
+}
+```
+
+### Header
+
+```swift
+public struct Header: Codable, Hashable, Sendable {
+    public let alg: String      // Algorithm (required)
+    public let typ: String?     // Type (typically "JWT")
+    public let cty: String?     // Content type
+    public let kid: String?     // Key ID
+
+    func additionalParameter<T>(_ key: String, as type: T.Type) -> T?
+}
+```
+
+### Payload (Claims)
+
+```swift
+public struct Payload: Codable, Hashable, Sendable {
+    public let iss: String?                         // Issuer
+    public let sub: String?                         // Subject
+    public let aud: Audience?                       // Audience
+    public let exp: Date?                           // Expiration time
+    public let nbf: Date?                           // Not before time
+    public let iat: Date?                           // Issued at time
+    public let jti: String?                         // JWT ID
+
+    func additionalClaim<T>(_ key: String, as type: T.Type) -> T?
+    func validateTiming(clockSkew: TimeInterval = 60) throws
+}
+```
+
+### Audience Type
+
+```swift
+public enum Audience: Codable, Hashable, Sendable {
+    case single(String)
+    case multiple([String])
+}
+```
+
+### Error Types
+
+```swift
+public enum Error: Swift.Error {
+    case invalidFormat(String)
+    case invalidSignature
+    case tokenExpired
+    case tokenNotYetValid
+}
+```
+
+## Related Packages
+
+### Dependencies
+- None - This is a pure Swift implementation
+
+### Recommended Crypto Libraries
+- [CryptoKit](https://developer.apple.com/documentation/cryptokit) - Apple's cryptography framework (Apple platforms)
+- [Swift Crypto](https://github.com/apple/swift-crypto) - Cross-platform Swift cryptography
+
+### Related Standards
+- [RFC 7515](https://www.rfc-editor.org/rfc/rfc7515.html) - JSON Web Signature (JWS)
+- [RFC 7516](https://www.rfc-editor.org/rfc/rfc7516.html) - JSON Web Encryption (JWE)
+- [RFC 7517](https://www.rfc-editor.org/rfc/rfc7517.html) - JSON Web Key (JWK)
+- [RFC 7518](https://www.rfc-editor.org/rfc/rfc7518.html) - JSON Web Algorithms (JWA)
+
+## Requirements
+
+- Swift 6.0+
+- macOS 13.0+ / iOS 16.0+ / tvOS 16.0+ / watchOS 9.0+
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This library is released under the Apache License 2.0. See [LICENSE](LICENSE) for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
