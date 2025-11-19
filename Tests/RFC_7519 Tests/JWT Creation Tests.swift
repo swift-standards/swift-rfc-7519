@@ -6,7 +6,6 @@
 //
 
 import Testing
-import Foundation
 @testable import RFC_7519
 
 @Suite("JWT Creation Tests")
