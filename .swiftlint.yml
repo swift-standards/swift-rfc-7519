@@ -2,13 +2,6 @@ disabled_rules:
   - line_length
   - trailing_comma
   - redundant_discardable_let
-  - trailing_whitespace
-  - unused_closure_parameter
-  - non_optional_string_data_conversion
-  - for_where
-  - nesting
-  - trailing_newline
-  - vertical_whitespace
 
 opt_in_rules:
   - explicit_init
@@ -55,7 +48,7 @@ function_parameter_count:
 # Cyclomatic complexity
 cyclomatic_complexity:
   warning: 15
-  error: 25
+  error: 20
 
 # Identifier name settings
 identifier_name:
@@ -69,8 +62,6 @@ identifier_name:
     - URL
     - to
     - db
-    - a
-    - b
 
 # Type name settings - allow RFC_XXXX pattern
 type_name:
