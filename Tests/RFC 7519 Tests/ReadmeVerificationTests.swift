@@ -8,11 +8,11 @@
 import RFC_7519
 import Testing
 
-@Suite("README Verification")
-struct ReadmeVerificationTests {
+@Suite
+struct `README Verification` {
 
-    @Test("README Line 48-68: Parsing and Inspecting JWTs")
-    func parsingAndInspectingJWTs() throws {
+    @Test
+    func `README Line 48-68: Parsing and Inspecting JWTs`() throws {
         // Create a test JWT manually
         let header = RFC_7519.JWT.Header(alg: "HS256", typ: "JWT")
         let payload = RFC_7519.JWT.Payload(
@@ -36,8 +36,8 @@ struct ReadmeVerificationTests {
         #expect(parsedJWT.header.typ == "JWT")
     }
 
-    @Test("README Line 72-83: Validating JWT Timing")
-    func validatingJWTTiming() throws {
+    @Test
+    func `README Line 72-83: Validating JWT Timing`() throws {
         // Create an expired token
         let expiredPayload = RFC_7519.JWT.Payload(
             iss: "example.com",
@@ -63,8 +63,8 @@ struct ReadmeVerificationTests {
         try validPayload.validateTiming(clockSkew: 120)
     }
 
-    @Test("README Line 87-110: Creating JWTs")
-    func creatingJWTs() throws {
+    @Test
+    func `README Line 87-110: Creating JWTs`() throws {
         // Create JWT payload
         let payload = RFC_7519.JWT.Payload(
             iss: "example.com",
@@ -96,8 +96,8 @@ struct ReadmeVerificationTests {
         #expect(parsed.payload.sub == "user123")
     }
 
-    @Test("README Line 114-137: Working with Audiences")
-    func workingWithAudiences() throws {
+    @Test
+    func `README Line 114-137: Working with Audiences`() throws {
         // Single audience
         let payload1 = RFC_7519.JWT.Payload(
             iss: "example.com",
@@ -128,8 +128,8 @@ struct ReadmeVerificationTests {
         }
     }
 
-    @Test("README Line 143-154: JWT Structure")
-    func jwtStructure() throws {
+    @Test
+    func `README Line 143-154: JWT Structure`() throws {
         let header = RFC_7519.JWT.Header(alg: "HS256")
         let payload = RFC_7519.JWT.Payload(iss: "test")
         let signature = Data([0x01, 0x02])
@@ -146,8 +146,8 @@ struct ReadmeVerificationTests {
         #expect(!signingInput.isEmpty)
     }
 
-    @Test("README Line 158-167: Header")
-    func header() throws {
+    @Test
+    func `README Line 158-167: Header`() throws {
         let header = RFC_7519.JWT.Header(
             alg: "HS256",
             typ: "JWT",
@@ -166,8 +166,8 @@ struct ReadmeVerificationTests {
         #expect(customValue == "value")
     }
 
-    @Test("README Line 171-184: Payload Claims")
-    func payloadClaims() throws {
+    @Test
+    func `README Line 171-184: Payload Claims`() throws {
         let now = Date()
 
         let payload = RFC_7519.JWT.Payload(
@@ -193,8 +193,8 @@ struct ReadmeVerificationTests {
         try payload.validateTiming()
     }
 
-    @Test("README Line 188-193: Audience Type")
-    func audienceType() throws {
+    @Test
+    func `README Line 188-193: Audience Type`() throws {
         let singleAud = RFC_7519.JWT.Payload.Audience.single("api.example.com")
         let multiAud = RFC_7519.JWT.Payload.Audience.multiple(["api1.example.com", "api2.example.com"])
 
@@ -211,8 +211,8 @@ struct ReadmeVerificationTests {
         #expect(multiAud == decodedMulti)
     }
 
-    @Test("README Line 197-204: Error Types")
-    func errorTypes() throws {
+    @Test
+    func `README Line 197-204: Error Types`() throws {
         // Test invalid format error
         #expect(throws: RFC_7519.Error.self) {
             _ = try RFC_7519.JWT.parse(from: "invalid.token")
@@ -235,8 +235,8 @@ struct ReadmeVerificationTests {
         }
     }
 
-    @Test("Additional: Custom claims type safety")
-    func customClaimsTypeSafety() throws {
+    @Test
+    func `Additional: Custom claims type safety`() throws {
         let payload = RFC_7519.JWT.Payload(
             iss: "test",
             additionalClaims: [
@@ -256,8 +256,8 @@ struct ReadmeVerificationTests {
         #expect(payload.additionalClaim("stringValue", as: Int.self) == nil)
     }
 
-    @Test("Additional: JWT round-trip consistency")
-    func jwtRoundTripConsistency() throws {
+    @Test
+    func `Additional: JWT round-trip consistency`() throws {
         let originalHeader = RFC_7519.JWT.Header(
             alg: "RS256",
             typ: "JWT",

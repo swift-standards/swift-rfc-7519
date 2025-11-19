@@ -8,13 +8,13 @@
 import Testing
 @testable import RFC_7519
 
-@Suite("RFC 7519 Tests")
-struct RFC_7519_Tests {
+@Suite
+struct `RFC 7519 Tests` {
     
     // MARK: - JWT Parsing Tests
     
-    @Test("JWT parsing from valid token")
-    func testValidJWTParsing() throws {
+    @Test
+    func `JWT parsing from valid token`() throws {
         // Example JWT: {"alg":"HS256","typ":"JWT"}.{"sub":"1234567890","name":"John Doe","iat":1516239022}.signature
         let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
         
@@ -27,8 +27,8 @@ struct RFC_7519_Tests {
         #expect(jwt.payload.iat == Date(timeIntervalSince1970: 1516239022))
     }
     
-    @Test("JWT parsing with invalid format")
-    func testInvalidJWTFormat() {
+    @Test
+    func `JWT parsing with invalid format`() {
         // Too few parts
         #expect(throws: RFC_7519.Error.self) {
             try RFC_7519.JWT.parse(from: "invalid.token")
@@ -45,8 +45,8 @@ struct RFC_7519_Tests {
         }
     }
     
-    @Test("JWT parsing with invalid base64url encoding")
-    func testInvalidBase64URLEncoding() {
+    @Test
+    func `JWT parsing with invalid base64url encoding`() {
         // Invalid base64url in header
         #expect(throws: RFC_7519.Error.self) {
             try RFC_7519.JWT.parse(from: "invalid@base64.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature")
@@ -63,8 +63,8 @@ struct RFC_7519_Tests {
         }
     }
     
-    @Test("JWT parsing with invalid JSON")
-    func testInvalidJSON() {
+    @Test
+    func `JWT parsing with invalid JSON`() {
         // Invalid JSON in header (base64url encoded "{invalid json}")
         #expect(throws: RFC_7519.Error.self) {
             try RFC_7519.JWT.parse(from: "e2ludmFsaWQganNvbn0.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature")
@@ -78,8 +78,8 @@ struct RFC_7519_Tests {
     
     // MARK: - JWT Serialization Tests
     
-    @Test("JWT compact serialization")
-    func testCompactSerialization() throws {
+    @Test
+    func `JWT compact serialization`() throws {
         let header = RFC_7519.JWT.Header(alg: "HS256", typ: "JWT")
         let payload = RFC_7519.JWT.Payload(
             sub: "1234567890",
@@ -100,8 +100,8 @@ struct RFC_7519_Tests {
         #expect(parsedJWT.payload.sub == "1234567890")
     }
     
-    @Test("JWT signing input generation")
-    func testSigningInput() throws {
+    @Test
+    func `JWT signing input generation`() throws {
         let header = RFC_7519.JWT.Header(alg: "HS256")
         let payload = RFC_7519.JWT.Payload(sub: "test")
         let jwt = RFC_7519.JWT(header: header, payload: payload, signature: Data())
@@ -114,8 +114,8 @@ struct RFC_7519_Tests {
         #expect(signingInputString!.components(separatedBy: ".").count == 2)
     }
     
-    @Test("JWT preserves original base64url strings for efficiency")
-    func testOriginalBase64URLPreservation() throws {
+    @Test
+    func `JWT preserves original base64url strings for efficiency`() throws {
         // Use a real JWT with known base64url components
         let originalToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
         
@@ -139,8 +139,8 @@ struct RFC_7519_Tests {
     
     // MARK: - Header Tests
     
-    @Test("JWT header with basic fields")
-    func testBasicHeader() {
+    @Test
+    func `JWT header with basic fields`() {
         let header = RFC_7519.JWT.Header(alg: "HS256", typ: "JWT")
         
         #expect(header.alg == "HS256")
@@ -149,8 +149,8 @@ struct RFC_7519_Tests {
         #expect(header.kid == nil)
     }
     
-    @Test("JWT header with all fields")
-    func testHeaderWithAllFields() {
+    @Test
+    func `JWT header with all fields`() {
         let additionalParams: [String: Any] = ["custom": "value", "number": 42]
         let header = RFC_7519.JWT.Header(
             alg: "RS256",
@@ -168,8 +168,8 @@ struct RFC_7519_Tests {
         #expect(header.additionalParameter("number", as: Int.self) == 42)
     }
     
-    @Test("JWT header coding round trip")
-    func testHeaderCodingRoundTrip() throws {
+    @Test
+    func `JWT header coding round trip`() throws {
         let header = RFC_7519.JWT.Header(
             alg: "ES256",
             typ: "JWT",
@@ -192,8 +192,8 @@ struct RFC_7519_Tests {
     
     // MARK: - Payload Tests
     
-    @Test("JWT payload with basic claims")
-    func testBasicPayload() {
+    @Test
+    func `JWT payload with basic claims`() {
         let payload = RFC_7519.JWT.Payload(iss: "example.com", sub: "user123")
         
         #expect(payload.sub == "user123")
@@ -202,8 +202,8 @@ struct RFC_7519_Tests {
         #expect(payload.exp == nil)
     }
     
-    @Test("JWT payload with all registered claims")
-    func testPayloadWithAllRegisteredClaims() {
+    @Test
+    func `JWT payload with all registered claims`() {
         let issuedAt = Date()
         let expiration = Date(timeIntervalSinceNow: 3600)
         let notBefore = Date(timeIntervalSinceNow: -60)
@@ -235,8 +235,8 @@ struct RFC_7519_Tests {
         }
     }
     
-    @Test("JWT payload with additional claims")
-    func testPayloadWithAdditionalClaims() {
+    @Test
+    func `JWT payload with additional claims`() {
         let additionalClaims: [String: Any] = [
             "role": "admin",
             "permissions": ["read", "write"],
@@ -254,8 +254,8 @@ struct RFC_7519_Tests {
         #expect(payload.additionalClaim("score", as: Double.self) == 95.5)
     }
     
-    @Test("JWT payload coding round trip")
-    func testPayloadCodingRoundTrip() throws {
+    @Test
+    func `JWT payload coding round trip`() throws {
         let payload = RFC_7519.JWT.Payload(
             iss: "test-issuer",
             sub: "test-subject",
@@ -284,8 +284,8 @@ struct RFC_7519_Tests {
     
     // MARK: - Audience Tests
     
-    @Test("Single audience handling")
-    func testSingleAudience() {
+    @Test
+    func `Single audience handling`() {
         let audience = RFC_7519.JWT.Payload.Audience("api.example.com")
         
         #expect(audience.values == ["api.example.com"])
@@ -293,8 +293,8 @@ struct RFC_7519_Tests {
         #expect(!audience.contains("other.com"))
     }
     
-    @Test("Multiple audience handling")
-    func testMultipleAudience() {
+    @Test
+    func `Multiple audience handling`() {
         let audience = RFC_7519.JWT.Payload.Audience(["api1.com", "api2.com"])
         
         #expect(audience.values == ["api1.com", "api2.com"])
@@ -303,8 +303,8 @@ struct RFC_7519_Tests {
         #expect(!audience.contains("api3.com"))
     }
     
-    @Test("Audience initialization from single string array")
-    func testAudienceFromSingleStringArray() {
+    @Test
+    func `Audience initialization from single string array`() {
         let audience = RFC_7519.JWT.Payload.Audience(["api.example.com"])
         
         // Should convert single-item array to single audience
@@ -312,8 +312,8 @@ struct RFC_7519_Tests {
         #expect(audience.contains("api.example.com"))
     }
     
-    @Test("Audience coding round trip")
-    func testAudienceCodingRoundTrip() throws {
+    @Test
+    func `Audience coding round trip`() throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
         
@@ -332,8 +332,8 @@ struct RFC_7519_Tests {
     
     // MARK: - Timing Validation Tests
     
-    @Test("Valid timing claims validation")
-    func testValidTimingClaims() throws {
+    @Test
+    func `Valid timing claims validation`() throws {
         let now = Date()
         let payload = RFC_7519.JWT.Payload(
             exp: Date(timeIntervalSinceNow: 3600), // Expires in 1 hour
@@ -345,8 +345,8 @@ struct RFC_7519_Tests {
         try payload.validateTiming(currentTime: now)
     }
     
-    @Test("Expired token validation")
-    func testExpiredToken() {
+    @Test
+    func `Expired token validation`() {
         let payload = RFC_7519.JWT.Payload(
             exp: Date(timeIntervalSinceNow: -3600) // Expired 1 hour ago
         )
@@ -356,8 +356,8 @@ struct RFC_7519_Tests {
         }
     }
     
-    @Test("Not yet valid token validation")
-    func testNotYetValidToken() {
+    @Test
+    func `Not yet valid token validation`() {
         let payload = RFC_7519.JWT.Payload(
             nbf: Date(timeIntervalSinceNow: 3600) // Valid in 1 hour
         )
@@ -367,8 +367,8 @@ struct RFC_7519_Tests {
         }
     }
     
-    @Test("Clock skew tolerance")
-    func testClockSkewTolerance() throws {
+    @Test
+    func `Clock skew tolerance`() throws {
         let now = Date()
         let payload = RFC_7519.JWT.Payload(
             exp: Date(timeIntervalSinceNow: -30) // Expired 30 seconds ago
@@ -385,8 +385,8 @@ struct RFC_7519_Tests {
     
     // MARK: - Base64URL Encoding Tests
     
-    @Test("Base64URL encoding properties")
-    func testBase64URLEncoding() {
+    @Test
+    func `Base64URL encoding properties`() {
         let testData = "Hello, World!".data(using: .utf8)!
         let encoded = testData.base64URLEncodedString()
         
@@ -396,8 +396,8 @@ struct RFC_7519_Tests {
         #expect(!encoded.contains("="))
     }
     
-    @Test("Base64URL decoding round trip")
-    func testBase64URLDecoding() {
+    @Test
+    func `Base64URL decoding round trip`() {
         let original = "Hello, World!"
         let data = original.data(using: .utf8)!
         let encoded = data.base64URLEncodedString()
@@ -407,8 +407,8 @@ struct RFC_7519_Tests {
         #expect(String(data: decoded!, encoding: .utf8) == original)
     }
     
-    @Test("Base64URL padding handling")
-    func testBase64URLPaddingHandling() {
+    @Test
+    func `Base64URL padding handling`() {
         // Test strings that would need different amounts of padding
         let testCases = ["A", "AB", "ABC", "ABCD"]
         
@@ -424,8 +424,8 @@ struct RFC_7519_Tests {
     
     // MARK: - AnyCodable Tests
     
-    @Test("AnyCodable with basic types")
-    func testAnyCodableWithBasicTypes() {
+    @Test
+    func `AnyCodable with basic types`() {
         let stringValue = AnyCodable("test")
         let intValue = AnyCodable(42)
         let boolValue = AnyCodable(true)
@@ -437,8 +437,8 @@ struct RFC_7519_Tests {
         #expect(doubleValue.value as? Double == 3.14)
     }
     
-    @Test("AnyCodable coding round trip")
-    func testAnyCodableCodingRoundTrip() throws {
+    @Test
+    func `AnyCodable coding round trip`() throws {
         let original = AnyCodable("test value")
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
@@ -449,8 +449,8 @@ struct RFC_7519_Tests {
         #expect(decoded.value as? String == "test value")
     }
     
-    @Test("AnyCodable equality")
-    func testAnyCodableEquality() {
+    @Test
+    func `AnyCodable equality`() {
         let string1 = AnyCodable("test")
         let string2 = AnyCodable("test")
         let string3 = AnyCodable("different")
@@ -468,8 +468,8 @@ struct RFC_7519_Tests {
     
     // MARK: - Error Tests
     
-    @Test("Error localized descriptions")
-    func testErrorLocalizedDescriptions() {
+    @Test
+    func `Error localized descriptions`() {
         let formatError = RFC_7519.Error.invalidFormat("test message")
         let expiredError = RFC_7519.Error.tokenExpired("expired at time")
         let notValidError = RFC_7519.Error.tokenNotYetValid("not valid until time")
@@ -485,8 +485,8 @@ struct RFC_7519_Tests {
     
     // MARK: - Edge Cases
     
-    @Test("Edge case: whitespace handling in token parsing")
-    func testWhitespaceHandling() throws {
+    @Test
+    func `Edge case: whitespace handling in token parsing`() throws {
         // Use a valid base64url signature
         let token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.validBase64UrlSignature"
         let tokenWithWhitespace = "  \(token)  "
@@ -497,8 +497,8 @@ struct RFC_7519_Tests {
         #expect(jwt.payload.sub == "test")
     }
     
-    @Test("Edge case: large payload handling")
-    func testLargePayload() throws {
+    @Test
+    func `Edge case: large payload handling`() throws {
         let largeClaims = (0..<100).reduce(into: [String: Any]()) { result, index in
             result["claim_\(index)"] = "value_\(index)_" + String(repeating: "x", count: 100)
         }
@@ -518,8 +518,8 @@ struct RFC_7519_Tests {
         #expect(parsed.payload.additionalClaim("claim_0", as: String.self)?.hasPrefix("value_0_") == true)
     }
     
-    @Test("Edge case: minimal valid JWT")
-    func testMinimalValidJWT() throws {
+    @Test
+    func `Edge case: minimal valid JWT`() throws {
         let header = RFC_7519.JWT.Header(alg: "none")
         let payload = RFC_7519.JWT.Payload()
         let jwt = RFC_7519.JWT(header: header, payload: payload, signature: Data())
@@ -532,8 +532,8 @@ struct RFC_7519_Tests {
         #expect(parsed.payload.iss == nil)
     }
     
-    @Test("Edge case: header without typ field")
-    func testHeaderWithoutTyp() throws {
+    @Test
+    func `Edge case: header without typ field`() throws {
         let header = RFC_7519.JWT.Header(alg: "HS256", typ: nil)
         let payload = RFC_7519.JWT.Payload(sub: "test")
         let jwt = RFC_7519.JWT(header: header, payload: payload, signature: Data())

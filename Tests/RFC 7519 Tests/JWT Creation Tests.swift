@@ -8,13 +8,13 @@
 import Testing
 @testable import RFC_7519
 
-@Suite("JWT Creation Tests")
-struct JWT_Creation_Tests {
+@Suite
+struct `JWT Creation Tests` {
     
     // MARK: - Generic JWT Creation Tests
     
-    @Test("JWT creation with generic signer")
-    func testJWTGenericSigner() throws {
+    @Test
+    func `JWT creation with generic signer`() throws {
         // Mock HMAC signer that just returns predictable bytes
         let mockSigner: (Data) throws -> Data = { signingInput in
             return Data([0x01, 0x02, 0x03, 0x04]) // Mock signature
@@ -41,8 +41,8 @@ struct JWT_Creation_Tests {
         #expect(jwt.signature == Data([0x01, 0x02, 0x03, 0x04]))
     }
     
-    @Test("JWT creation with multiple audiences")
-    func testJWTMultipleAudiences() throws {
+    @Test
+    func `JWT creation with multiple audiences`() throws {
         let mockSigner: (Data) throws -> Data = { _ in Data() }
         
         let jwt = try RFC_7519.JWT(
@@ -57,8 +57,8 @@ struct JWT_Creation_Tests {
         #expect(jwt.payload.aud?.values == ["api1.example.com", "api2.example.com", "api3.example.com"])
     }
     
-    @Test("JWT creation with timing controls")
-    func testJWTTimingControls() throws {
+    @Test
+    func `JWT creation with timing controls`() throws {
         let customIat = Date(timeIntervalSinceNow: -60) // 1 minute ago
         let customExp = Date(timeIntervalSinceNow: 7200) // 2 hours from now
         let customNbf = Date(timeIntervalSinceNow: 300) // 5 minutes from now
@@ -80,8 +80,8 @@ struct JWT_Creation_Tests {
         #expect(abs(jwt.payload.nbf!.timeIntervalSince1970 - customNbf.timeIntervalSince1970) < 1.0)
     }
     
-    @Test("JWT creation with custom header parameters")
-    func testJWTCustomHeaders() throws {
+    @Test
+    func `JWT creation with custom header parameters`() throws {
         let mockSigner: (Data) throws -> Data = { _ in Data() }
         
         let jwt = try RFC_7519.JWT(
@@ -99,8 +99,8 @@ struct JWT_Creation_Tests {
     
     // MARK: - Generic Verification Tests
     
-    @Test("JWT verification with generic verifier")
-    func testJWTGenericVerifier() throws {
+    @Test
+    func `JWT verification with generic verifier`() throws {
         let expectedSignature = Data([0x05, 0x06, 0x07, 0x08])
         
         let mockSigner: (Data) throws -> Data = { _ in expectedSignature }
@@ -128,8 +128,8 @@ struct JWT_Creation_Tests {
         #expect(!isInvalid)
     }
     
-    @Test("JWT verification with timing validation")
-    func testJWTVerificationWithTiming() throws {
+    @Test
+    func `JWT verification with timing validation`() throws {
         let mockSigner: (Data) throws -> Data = { _ in Data([0x09, 0x0A]) }
         
         // Create expired token
@@ -165,8 +165,8 @@ struct JWT_Creation_Tests {
         #expect(isValid)
     }
     
-    @Test("JWT verification with not-yet-valid token")
-    func testJWTVerificationNotYetValid() throws {
+    @Test
+    func `JWT verification with not-yet-valid token`() throws {
         let mockSigner: (Data) throws -> Data = { _ in Data([0x0B, 0x0C]) }
         
         let jwt = try RFC_7519.JWT(
@@ -191,8 +191,8 @@ struct JWT_Creation_Tests {
     
     // MARK: - Edge Cases
     
-    @Test("JWT with no algorithm (none)")
-    func testJWTWithNoAlgorithm() throws {
+    @Test
+    func `JWT with no algorithm (none)`() throws {
         let mockSigner: (Data) throws -> Data = { _ in Data() } // Empty signature for 'none'
         
         let jwt = try RFC_7519.JWT(
@@ -215,8 +215,8 @@ struct JWT_Creation_Tests {
         #expect(isValid)
     }
     
-    @Test("JWT creation with custom algorithm")
-    func testJWTCustomAlgorithm() throws {
+    @Test
+    func `JWT creation with custom algorithm`() throws {
         let customSigner: (Data) throws -> Data = { signingInput in
             // Custom signature algorithm - just reverse the bytes for testing
             return Data(signingInput.reversed())
@@ -243,8 +243,8 @@ struct JWT_Creation_Tests {
         #expect(isValid)
     }
     
-    @Test("JWT creation error handling")
-    func testJWTCreationErrorHandling() throws {
+    @Test
+    func `JWT creation error handling`() throws {
         let failingSigner: (Data) throws -> Data = { _ in
             struct SigningError: Swift.Error {}
             throw SigningError()
