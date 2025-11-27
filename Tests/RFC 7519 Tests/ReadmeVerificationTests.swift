@@ -82,7 +82,7 @@ struct `README Verification` {
         )
 
         // Create JWT
-        let signature = Data([0x01, 0x02, 0x03])
+        let signature = [UInt8]([0x01, 0x02, 0x03])
         let jwt = RFC_7519.JWT(header: header, payload: payload, signature: signature)
 
         // Serialize to string
@@ -132,7 +132,7 @@ struct `README Verification` {
     func `README Line 143-154: JWT Structure`() throws {
         let header = RFC_7519.JWT.Header(alg: "HS256")
         let payload = RFC_7519.JWT.Payload(iss: "test")
-        let signature = Data([0x01, 0x02])
+        let signature = [UInt8]([0x01, 0x02])
 
         let jwt = RFC_7519.JWT(header: header, payload: payload, signature: signature)
 
@@ -271,7 +271,7 @@ struct `README Verification` {
             iat: Date(),
             additionalClaims: ["scope": "read write"]
         )
-        let originalSignature = Data([0xDE, 0xAD, 0xBE, 0xEF])
+        let originalSignature = [UInt8]([0xDE, 0xAD, 0xBE, 0xEF])
 
         let originalJWT = RFC_7519.JWT(
             header: originalHeader,

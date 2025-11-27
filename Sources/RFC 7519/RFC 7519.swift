@@ -194,7 +194,7 @@ extension RFC_7519.JWT {
             case typ, alg, cty, kid
         }
         
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let dynamicContainer = try decoder.container(keyedBy: DynamicCodingKey.self)
             
@@ -213,7 +213,7 @@ extension RFC_7519.JWT {
             self.additionalParameters = additional.isEmpty ? nil : additional
         }
         
-        public func encode(to encoder: Encoder) throws {
+        public func encode(to encoder: any Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             var dynamicContainer = encoder.container(keyedBy: DynamicCodingKey.self)
             
@@ -320,7 +320,7 @@ extension RFC_7519.JWT {
             case iss, sub, aud, exp, nbf, iat, jti
         }
         
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let dynamicContainer = try decoder.container(keyedBy: DynamicCodingKey.self)
             
@@ -359,7 +359,7 @@ extension RFC_7519.JWT {
             self.additionalClaims = additional.isEmpty ? nil : additional
         }
         
-        public func encode(to encoder: Encoder) throws {
+        public func encode(to encoder: any Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             var dynamicContainer = encoder.container(keyedBy: DynamicCodingKey.self)
             
@@ -432,7 +432,7 @@ extension RFC_7519.JWT.Payload {
             return values.contains(audience)
         }
         
-        public init(from decoder: Decoder) throws {
+        public init(from decoder: any Decoder) throws {
             let container = try decoder.singleValueContainer()
             
             if let single = try? container.decode(String.self) {
@@ -450,7 +450,7 @@ extension RFC_7519.JWT.Payload {
             }
         }
         
-        public func encode(to encoder: Encoder) throws {
+        public func encode(to encoder: any Encoder) throws {
             var container = encoder.singleValueContainer()
             
             switch self {
@@ -539,7 +539,7 @@ public enum AnyCodable: Codable, Hashable, Sendable {
         }
     }
     
-    public init(from decoder: Decoder) throws {
+    public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         
         if let string = try? container.decode(String.self) {
@@ -562,7 +562,7 @@ public enum AnyCodable: Codable, Hashable, Sendable {
         }
     }
     
-    public func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
         
         switch self {

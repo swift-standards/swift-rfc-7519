@@ -17,7 +17,7 @@ struct `JWT Creation Tests` {
     func `JWT creation with generic signer`() throws {
         // Mock HMAC signer that just returns predictable bytes
         let mockSigner: (Data) throws -> Data = { signingInput in
-            return Data([0x01, 0x02, 0x03, 0x04]) // Mock signature
+            return [UInt8]([0x01, 0x02, 0x03, 0x04]) // Mock signature
         }
         
         let jwt = try RFC_7519.JWT(
@@ -38,7 +38,7 @@ struct `JWT Creation Tests` {
         #expect(jwt.payload.exp != nil)
         #expect(jwt.payload.iat != nil)
         #expect(jwt.payload.additionalClaim("role", as: String.self) == "admin")
-        #expect(jwt.signature == Data([0x01, 0x02, 0x03, 0x04]))
+        #expect(jwt.signature == [UInt8]([0x01, 0x02, 0x03, 0x04]))
     }
     
     @Test
@@ -101,7 +101,7 @@ struct `JWT Creation Tests` {
     
     @Test
     func `JWT verification with generic verifier`() throws {
-        let expectedSignature = Data([0x05, 0x06, 0x07, 0x08])
+        let expectedSignature = [UInt8]([0x05, 0x06, 0x07, 0x08])
         
         let mockSigner: (Data) throws -> Data = { _ in expectedSignature }
         
@@ -130,7 +130,7 @@ struct `JWT Creation Tests` {
     
     @Test
     func `JWT verification with timing validation`() throws {
-        let mockSigner: (Data) throws -> Data = { _ in Data([0x09, 0x0A]) }
+        let mockSigner: (Data) throws -> Data = { _ in [UInt8]([0x09, 0x0A]) }
         
         // Create expired token
         let expiredJWT = try RFC_7519.JWT(
@@ -167,7 +167,7 @@ struct `JWT Creation Tests` {
     
     @Test
     func `JWT verification with not-yet-valid token`() throws {
-        let mockSigner: (Data) throws -> Data = { _ in Data([0x0B, 0x0C]) }
+        let mockSigner: (Data) throws -> Data = { _ in [UInt8]([0x0B, 0x0C]) }
         
         let jwt = try RFC_7519.JWT(
             algorithmName: "HS256",

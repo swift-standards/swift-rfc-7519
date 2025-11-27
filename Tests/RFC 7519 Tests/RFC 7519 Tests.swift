@@ -86,7 +86,7 @@ struct `RFC 7519 Tests` {
             iat: Date(timeIntervalSince1970: 1516239022),
             additionalClaims: ["name": "John Doe"]
         )
-        let signature = Data([0x49, 0xF9, 0x4A, 0xC7, 0x04, 0x49, 0x48, 0xC7])
+        let signature = [UInt8]([0x49, 0xF9, 0x4A, 0xC7, 0x04, 0x49, 0x48, 0xC7])
         
         let jwt = RFC_7519.JWT(header: header, payload: payload, signature: signature)
         let serialized = try jwt.compactSerialization()

@@ -22,13 +22,15 @@ let package = Package(
         .library(name: .rfc7519, targets: [.rfc7519])
     ],
     dependencies: [
+        .package(url: "https://github.com/swift-standards/swift-ieee-754.git", from: "0.1.0"),
         // Add RFC dependencies here as needed
-        // .package(url: "https://github.com/swift-standards/swift-rfc-1123.git", branch: "main"),
+        // .package(url: "https://github.com/swift-standards/swift-rfc-1123.git", from: "0.1.0"),
     ],
     targets: [
         .target(
             name: .rfc7519,
             dependencies: [
+                .product(name: "IEEE 754", package: "swift-ieee-754"),
                 // Add target dependencies here
             ]
         ),
@@ -42,4 +44,16 @@ let package = Package(
     swiftLanguageModes: [.v6]
 )
 
-extension String { var tests: Self { self + " Tests" } }
+extension String {
+    var tests: Self { self + " Tests" }
+    var foundation: Self { self + " Foundation" }
+}
+
+for target in package.targets where ![.system, .binary, .plugin].contains(target.type) {
+    let existing = target.swiftSettings ?? []
+    target.swiftSettings = existing + [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableUpcomingFeature("InternalImportsByDefault"),
+        .enableUpcomingFeature("MemberImportVisibility")
+    ]
+}
