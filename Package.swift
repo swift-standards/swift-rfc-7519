@@ -1,4 +1,4 @@
-// swift-tools-version:6.2
+// swift-tools-version: 6.2
 
 import PackageDescription
 
@@ -8,6 +8,9 @@ extension String {
 
 extension Target.Dependency {
     static var rfc7519: Self { .target(name: .rfc7519) }
+    static var incits41986: Self { .product(name: "INCITS 4 1986", package: "swift-incits-4-1986") }
+    static var standards: Self { .product(name: "Standards", package: "swift-standards") }
+    static var rfc4648: Self { .product(name: "RFC 4648", package: "swift-rfc-4648") }
 }
 
 let package = Package(
@@ -16,29 +19,28 @@ let package = Package(
         .macOS(.v15),
         .iOS(.v18),
         .tvOS(.v18),
-        .watchOS(.v11)
+        .watchOS(.v11),
     ],
     products: [
         .library(name: .rfc7519, targets: [.rfc7519])
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-standards/swift-ieee-754.git", from: "0.1.0"),
-        // Add RFC dependencies here as needed
-        // .package(url: "https://github.com/swift-standards/swift-rfc-1123.git", from: "0.1.0"),
+        .package(url: "https://github.com/swift-standards/swift-incits-4-1986", from: "0.5.0"),
+        .package(url: "https://github.com/swift-standards/swift-standards", from: "0.1.0"),
+        .package(url: "https://github.com/swift-standards/swift-rfc-4648", from: "0.1.0"),
     ],
     targets: [
         .target(
             name: .rfc7519,
             dependencies: [
-                .product(name: "IEEE 754", package: "swift-ieee-754"),
-                // Add target dependencies here
+                .incits41986,
+                .standards,
+                .rfc4648,
             ]
         ),
         .testTarget(
             name: .rfc7519.tests,
-            dependencies: [
-                .rfc7519
-            ]
+            dependencies: [.rfc7519]
         ),
     ],
     swiftLanguageModes: [.v6]
@@ -46,14 +48,14 @@ let package = Package(
 
 extension String {
     var tests: Self { self + " Tests" }
-    var foundation: Self { self + " Foundation" }
 }
 
 for target in package.targets where ![.system, .binary, .plugin].contains(target.type) {
     let existing = target.swiftSettings ?? []
-    target.swiftSettings = existing + [
-        .enableUpcomingFeature("ExistentialAny"),
-        .enableUpcomingFeature("InternalImportsByDefault"),
-        .enableUpcomingFeature("MemberImportVisibility")
-    ]
+    target.swiftSettings =
+        existing + [
+            .enableUpcomingFeature("ExistentialAny"),
+            .enableUpcomingFeature("InternalImportsByDefault"),
+            .enableUpcomingFeature("MemberImportVisibility"),
+        ]
 }
