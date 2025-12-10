@@ -23,7 +23,8 @@ struct JWTTests {
     @Test
     func parseValidJWT() throws {
         // Example JWT: {"alg":"HS256","typ":"JWT"}.{"sub":"1234567890","name":"John Doe","iat":1516239022}.signature
-        let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        let token =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 
         let jwt = try RFC_7519.JWT(ascii: token.utf8)
 
@@ -93,7 +94,9 @@ struct JWTTests {
     @Test
     func parseJWTInvalidBase64URLInSignature() {
         #expect(throws: RFC_7519.JWT.Error.self) {
-            _ = try RFC_7519.JWT(ascii: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.invalid@base64".utf8)
+            _ = try RFC_7519.JWT(
+                ascii: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.invalid@base64".utf8
+            )
         }
     }
 
@@ -165,7 +168,8 @@ struct JWTTests {
 
     @Test
     func roundTripPreservesOriginalBase64URL() throws {
-        let originalToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        let originalToken =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 
         let jwt = try RFC_7519.JWT(ascii: originalToken.utf8)
         let serialized = String(jwt)
@@ -199,14 +203,17 @@ struct JWTTests {
     @Test
     func signingInputIsCorrect() throws {
         // Valid JWT with proper Base64URL signature
-        let originalToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U"
+        let originalToken =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U"
 
         let jwt = try RFC_7519.JWT(ascii: originalToken.utf8)
         let signingInput = jwt.signingInput
 
         // Signing input should be header.payload (without signature)
         let signingInputString = String(decoding: signingInput, as: UTF8.self)
-        #expect(signingInputString == "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0")
+        #expect(
+            signingInputString == "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0"
+        )
     }
 
     @Test

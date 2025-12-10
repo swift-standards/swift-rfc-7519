@@ -131,9 +131,9 @@ extension RFC_7519.JWT {
     }
 }
 
-// MARK: - UInt8.ASCII.Serializable
+// MARK: - Binary.ASCII.Serializable
 
-extension RFC_7519.JWT: UInt8.ASCII.Serializable {
+extension RFC_7519.JWT: Binary.ASCII.Serializable {
     /// Serialize JWT to compact format (header.payload.signature)
     ///
     /// Per RFC 7519/7515, outputs Base64URL-encoded parts separated by periods.
@@ -207,7 +207,10 @@ extension RFC_7519.JWT: UInt8.ASCII.Serializable {
             throw Error.emptyHeader
         }
         guard let header = RFC_4648.Base64.URL.decode(headerBase64URL) else {
-            throw Error.invalidBase64URL(String(decoding: headerBase64URL, as: UTF8.self), component: "header")
+            throw Error.invalidBase64URL(
+                String(decoding: headerBase64URL, as: UTF8.self),
+                component: "header"
+            )
         }
 
         // Decode payload
@@ -215,7 +218,10 @@ extension RFC_7519.JWT: UInt8.ASCII.Serializable {
             throw Error.emptyPayload
         }
         guard let payload = RFC_4648.Base64.URL.decode(payloadBase64URL) else {
-            throw Error.invalidBase64URL(String(decoding: payloadBase64URL, as: UTF8.self), component: "payload")
+            throw Error.invalidBase64URL(
+                String(decoding: payloadBase64URL, as: UTF8.self),
+                component: "payload"
+            )
         }
 
         // Decode signature (can be empty for unsecured JWTs)
@@ -224,7 +230,10 @@ extension RFC_7519.JWT: UInt8.ASCII.Serializable {
             signature = []
         } else {
             guard let decoded = RFC_4648.Base64.URL.decode(signatureBase64URL) else {
-                throw Error.invalidBase64URL(String(decoding: signatureBase64URL, as: UTF8.self), component: "signature")
+                throw Error.invalidBase64URL(
+                    String(decoding: signatureBase64URL, as: UTF8.self),
+                    component: "signature"
+                )
             }
             signature = decoded
         }
@@ -242,7 +251,7 @@ extension RFC_7519.JWT: UInt8.ASCII.Serializable {
 
 // MARK: - Protocol Conformances
 
-extension RFC_7519.JWT: UInt8.ASCII.RawRepresentable {
+extension RFC_7519.JWT: Binary.ASCII.RawRepresentable {
     public typealias RawValue = String
 }
 

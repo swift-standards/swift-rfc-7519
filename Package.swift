@@ -16,10 +16,10 @@ extension Target.Dependency {
 let package = Package(
     name: "swift-rfc-7519",
     platforms: [
-        .macOS(.v15),
-        .iOS(.v18),
-        .tvOS(.v18),
-        .watchOS(.v11),
+        .macOS(.v26),
+        .iOS(.v26),
+        .tvOS(.v26),
+        .watchOS(.v26),
     ],
     products: [
         .library(name: .rfc7519, targets: [.rfc7519])
