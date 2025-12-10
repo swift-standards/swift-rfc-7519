@@ -25,9 +25,9 @@ let package = Package(
         .library(name: .rfc7519, targets: [.rfc7519])
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-standards/swift-incits-4-1986", from: "0.6.2"),
+        .package(url: "https://github.com/swift-standards/swift-incits-4-1986", from: "0.6.3"),
         .package(url: "https://github.com/swift-standards/swift-standards", from: "0.10.0"),
-        .package(url: "https://github.com/swift-standards/swift-rfc-4648", from: "0.5.2"),
+        .package(url: "https://github.com/swift-standards/swift-rfc-4648", from: "0.5.3"),
     ],
     targets: [
         .target(
