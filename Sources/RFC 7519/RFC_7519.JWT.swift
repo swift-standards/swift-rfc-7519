@@ -11,7 +11,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import INCITS_4_1986
+public import ASCII
 
 extension RFC_7519 {
     /// A JSON Web Token as defined in RFC 7519
