@@ -29,7 +29,8 @@ let package = Package(
         .package(path: "../../swift-foundations/swift-ascii"),
         .package(path: "../../swift-primitives/swift-standard-library-extensions"),
         .package(path: "../../swift-primitives/swift-binary-primitives"),
-        .package(path: "../swift-rfc-4648")
+        .package(path: "../swift-rfc-4648"),
+        .package(path: "../../swift-primitives/swift-parser-primitives")
     ],
     targets: [
         .target(
@@ -38,7 +39,8 @@ let package = Package(
                 .incits41986,
                 .standards,
                 .binary,
-                .rfc4648
+                .rfc4648,
+                .product(name: "Parser Primitives", package: "swift-parser-primitives")
             ]
         ),
         .testTarget(
